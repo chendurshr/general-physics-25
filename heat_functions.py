@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr  1 16:53:18 2025
+
+@author: chend
+"""
+
+AIR_HEAT_CAPACITY = 1005
+GLASS_T_CONDUCTIVITY = 1.1  # W/mK
+GLASS_AREA = 1  # m2
+GLASS_THICNKESS = 0.02  # m
+GLASS_PARAM = GLASS_T_CONDUCTIVITY * GLASS_AREA / GLASS_THICNKESS
+WATTAGE = 800
