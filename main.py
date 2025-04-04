@@ -14,6 +14,8 @@ import scipy.special as sp
 import numerical_method
 import matplotlib.pyplot as plt
 
+num_rooms = 7000
+
 
 def std_calc(lower, mid, upper):
     lower_std = (mid - lower) / 4
@@ -105,6 +107,7 @@ month_list = ["September", "October", "November",
 dt = 0.1
 
 for month in range(len(month_list)):
+    print(month)
     total_energy_month = []
     for i in range(0, len(temp_list[month])):
         date = month_list[month] + " " + str(i+1)
@@ -115,26 +118,35 @@ for month in range(len(month_list)):
         T_euler_list.append(T_euler)
         total_energy_month.append(total_energy)
     total_energy_list.append(total_energy_month)
-    print(total_energy_list)
-
 print("total energy calc flag")
-month = 0
-plt.bar(range(1, len(temp_list[month])+1),
-        total_energy_list[month], width=1, edgecolor="k")
-plt.title(f"Total energy requirement on each day of {month_list[month]}")
-plt.xlabel("Day of the month")
-plt.ylabel(r"Energy (KWh)")
-plt.show()
 
-solar_watt = total_irradiance_general_gauss_list[month] / \
-    duration_list[month]
-plt.bar(range(1, len(temp_list[month])+1),
-        solar_watt*1000, width=1, edgecolor="k")
-plt.title(f"Average solar power (W/m2) on each day of {month_list[month]}")
-plt.xlabel("Day of the month")
-plt.ylabel(r"Solar Power ($W/m^2$)")
-plt.show()
+fig2, axs2 = plt.subplots(2, 3, figsize=(18, 10))
+axs2 = axs2.flatten()
+min_sol_irrad_list = []
+for month in range(6):
+    solar_watt = total_irradiance_general_gauss_list[month] / \
+        duration_list[month]
+    ax = axs2[month]
+    sol_irrad_min = np.argmin(solar_watt)
+    min_sol_irrad_list.append(solar_watt[sol_irrad_min])
+    ax.bar(
+        range(1, len(temp_list[month]) + 1),
+        solar_watt * 1000,
+        width=1,
+        edgecolor="k"
+    )
+    ax.bar(sol_irrad_min + 1, solar_watt[sol_irrad_min]*1000, width=1,
+           edgecolor="k", color="midnightblue", label="Minimum Daily Solar power")
+    ax.set_title(f"{month_list[month]}", fontsize=14)
+    ax.set_xlabel("Day of the month")
+    ax.set_ylabel("Solar Power (W/m²)")
+    ax.grid(axis='y', linestyle='--', alpha=0.5)
+    ax.legend()
+# fig2.suptitle("Average Solar Power per Day (First 6 Months)",
+    #     fontsize=18, y=1.02)
+plt.tight_layout()
 
+plt.show()
 
 fig, axs = plt.subplots(2, 3, figsize=(18, 10))
 axs = axs.flatten()  # To index subplots in a 1D loop
@@ -145,13 +157,14 @@ for month in range(len(month_list)):
     solar_output = solar_watt * \
         numerical_method.solar_panel_efficiency(temp_list[month])
     num_panels = total_energy_list[month]/(solar_output*1000)
+    num_panels *= num_rooms
     day_max = np.argmax(num_panels)
     max_num_panels_list.append(num_panels[day_max])
     ax = axs[month]
     ax.bar(range(1, len(temp_list[month]) + 1), num_panels,
            width=1, edgecolor="k", label='Number of Panels')
     ax.bar(day_max + 1, num_panels[day_max], width=1,
-           edgecolor="k", color="tomato", label="Max Panels")
+           edgecolor="k", color="tomato", label=fr"Max Panel Requirement($m^2$) ({num_panels[day_max]:.1f})")
 
     ax.set_title(f"{month_list[month]}", fontsize=14)
     ax.set_xlabel("Day of the month")
@@ -159,6 +172,6 @@ for month in range(len(month_list)):
     ax.grid(axis='y', linestyle='--', alpha=0.5)
     ax.legend()
 
-plt.suptitle("Number of Solar Panels Needed Each Day", fontsize=18, y=1.02)
+#plt.suptitle("Number of Solar Panels Needed Each Day", fontsize=18, y=1.02)
 plt.tight_layout()
 plt.show()

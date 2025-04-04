@@ -64,21 +64,23 @@ def single_plot(time_arr, temp_arr, ext_temp, radiator_setting, date):
 
 def multi_plot(time_arr_list, temp_arr_list, ext_temp, radiator_setting_list, title, total_energy_list):
     # Plot results
-    plt.figure(figsize=(12, 10))
+    plt.figure(figsize=(12, 6))
     colors_list = [["maroon", "navy", "orange"], ["red", "cyan", "green"]]
     max_temp = np.max((radiator_setting_list))
+    count = 1
     for colors, time_arr, temp_arr, radiator_setting, total_energy in zip(colors_list, time_arr_list, temp_arr_list, radiator_setting_list, total_energy_list):
         plt.plot(time_arr/3600, temp_arr,
-                 label=f"Total energy:{total_energy:.0f} Wh", color=colors[2])
+                 label=f"Total energy({count}):{total_energy:.0f} Wh", color=colors[2])
         plt.axhline(radiator_setting[0], linestyle="--",
-                    color=colors[1], label=r"$T_{low}$")
+                    color=colors[1], label=fr"$T_{{low}}$({count})")
         plt.axhline(radiator_setting[1], linestyle="--",
-                    color=colors[0], label=r"$T_{high}$")
+                    color=colors[0], label=fr"$T_{{high}}$({count})")
+        count += 1
     plt.axhline(ext_temp, linestyle="--", color="black",
                 label="Outside Temperature")
     plt.xlabel("Time (hours)")
     plt.ylabel("Temperature (°C)")
-    plt.title(title)
+  #  plt.title(title)
     plt.legend()
     plt.ylim(ext_temp - 1, max_temp + 1)
     plt.grid()
